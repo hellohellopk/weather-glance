@@ -59,6 +59,8 @@ h2{font-size:19px;margin:0 0 6px;line-height:1.25}
 .ext{display:flex;gap:8px;margin:0 0 4px;font-size:15px;font-weight:700}
 .ext span{flex:1;border-radius:14px;padding:6px 10px;background:var(--glass2);border:1px solid rgba(255,255,255,.22)}
 .ext .c{color:#c4e3ff}.ext .h{color:#ffd9c2}
+.legend{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);margin:4px 0 2px}
+.legend i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,hsl(220,90%,58%),hsl(176,85%,50%),hsl(132,80%,48%),hsl(88,85%,50%),hsl(44,95%,55%),hsl(0,90%,58%))}
 .day{padding:8px 0;border-top:1px solid rgba(255,255,255,.18)}
 .day:first-of-type{border-top:0}
 .dt{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center}
@@ -67,8 +69,8 @@ h2{font-size:19px;margin:0 0 6px;line-height:1.25}
 .d2{font-size:14px;color:var(--sub);line-height:1.25}
 .tr{font-size:21px;font-weight:700;text-align:right;white-space:nowrap;line-height:1.2}
 .tr small{display:block;font-size:12.5px;font-weight:400;color:var(--sub)}
-.bar{position:relative;height:10px;border-radius:5px;background:var(--track);margin:7px 0 0 58px;box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
-.bar i{position:absolute;top:0;bottom:0;border-radius:5px;min-width:8px;box-shadow:0 0 8px rgba(255,255,255,.35)}
+.bar{position:relative;height:12px;border-radius:6px;background:var(--track);margin:7px 0 0 58px;box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
+.bar i{position:absolute;top:0;bottom:0;border-radius:6px;min-width:10px;box-shadow:0 0 8px rgba(255,255,255,.4),inset 0 1px 0 rgba(255,255,255,.45)}
 .badge{display:inline-block;font-size:12px;font-weight:700;border-radius:8px;padding:0 6px;margin-left:6px;color:#fff;vertical-align:middle;border:1px solid rgba(255,255,255,.4)}
 .badge.c{background:rgba(30,127,216,.85)}.badge.h{background:rgba(230,74,25,.85)}
 .err{background:var(--warnbg);color:#fff;border:1px solid var(--stroke);padding:8px 12px;border-radius:14px;display:none;margin:6px 0;font-size:15px}
@@ -111,6 +113,7 @@ p{margin:4px 0;line-height:1.4}
 <section class="card">
 <h2>未來九天預報</h2>
 <div class="ext" id="ext"></div>
+<div class="legend"><span id="lgl">--</span><i></i><span id="lgh">--</span></div>
 <div id="days"></div>
 </section>
 
@@ -173,12 +176,12 @@ function warnStyle(key,code){
   if(key==='WFNTSA')return S('#00695c','#fff','🌊',35);
   if(key==='WTMW')return S('#b71c1c','#fff','🌊',70);
   return S('#455a64','#fff','⚠️',20)}
-function tempHue(t){const x=Math.max(8,Math.min(32,t));return Math.round(210-(x-8)/24*210)}
+function tempHue(t,lo,hi){const f=(t-lo)/Math.max(1,hi-lo);return Math.round(220*(1-Math.max(0,Math.min(1,f))))}
 function rangeBars(days){
   const mins=days.map(d=>+d.forecastMintemp.value),maxs=days.map(d=>+d.forecastMaxtemp.value);
   const lo=Math.min(...mins),hi=Math.max(...maxs),span=Math.max(1,hi-lo);
   return{lo,hi,coldIdx:mins.indexOf(lo),hotIdx:maxs.indexOf(hi),
-    bars:days.map((d,i)=>({l:(mins[i]-lo)/span*100,w:(maxs[i]-mins[i])/span*100,c1:tempHue(mins[i]),c2:tempHue(maxs[i])}))}}
+    bars:days.map((d,i)=>({l:(mins[i]-lo)/span*100,w:(maxs[i]-mins[i])/span*100,c1:tempHue(mins[i],lo,hi),c2:tempHue(maxs[i],lo,hi)}))}}
 const API='https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=';
 const ICON=n=>'https://www.hko.gov.hk/images/HKOWxIconOutline/pic'+n+'.png';
 const $=id=>document.getElementById(id);
@@ -305,6 +308,7 @@ function renderDays(){
   const W=n.weatherForecast,R=rangeBars(W);
   const lbl=d=>{const s=String(d.forecastDate);return(+s.slice(4,6))+'月'+(+s.slice(6,8))+'日'};
   $('ext').innerHTML='<span class="c">🥶 最凍：'+lbl(W[R.coldIdx])+' '+R.lo+'°</span><span class="h">🥵 最熱：'+lbl(W[R.hotIdx])+' '+R.hi+'°</span>';
+  $('lgl').textContent=R.lo+'°';$('lgh').textContent=R.hi+'°';
   $('days').innerHTML=W.map((d,i)=>{
     const b=R.bars[i];
     return '<div class="day"><div class="dt"><img src="'+ICON(d.ForecastIcon)+'" alt="" loading="lazy">'+
@@ -312,7 +316,7 @@ function renderDays(){
     '<div class="d2">'+esc(d.forecastWeather)+'</div>'+
     '<div class="d2">💧 降雨概率：'+esc(d.PSR||'--')+'</div></div>'+
     '<div class="tr">'+d.forecastMintemp.value+'–'+d.forecastMaxtemp.value+'°<small>濕度 '+d.forecastMinrh.value+'–'+d.forecastMaxrh.value+'%</small></div></div>'+
-    '<div class="bar" title="'+R.lo+'°–'+R.hi+'° 範圍"><i style="left:'+b.l.toFixed(1)+'%;width:'+b.w.toFixed(1)+'%;background:linear-gradient(90deg,hsl('+b.c1+',85%,52%),hsl('+b.c2+',85%,52%))"></i></div></div>';
+    '<div class="bar" title="'+R.lo+'°–'+R.hi+'° 範圍"><i style="left:'+b.l.toFixed(1)+'%;width:'+b.w.toFixed(1)+'%;background:linear-gradient(90deg,hsl('+b.c1+',90%,55%),hsl('+Math.round((b.c1+b.c2)/2)+',90%,52%),hsl('+b.c2+',90%,55%))"></i></div></div>';
   }).join('');
 }
 
