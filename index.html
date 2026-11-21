@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>天氣一眼睇</title>
+<meta name="theme-color" content="#0b66c3">
+<meta name="description" content="香港天文台開放數據天氣App">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="天氣一眼睇">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{--bg:#eaf3fc;--card:#fff;--ink:#14243a;--sub:#5b6b80;--pri:#0b66c3;--warn:#c62828;--warnbg:#fdecea}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1722;--card:#17283a;--ink:#eef4fb;--sub:#9db0c6;--pri:#5aa9f5;--warn:#ff8a80;--warnbg:#3a1d1d}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 -apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans HK","Microsoft JhengHei",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:560px;margin:0 auto;padding:12px}
+header{display:flex;justify-content:space-between;align-items:center;padding:8px 4px}
+h1{font-size:24px;margin:0}
+button{font:inherit;border:0;border-radius:12px;background:var(--pri);color:#fff;padding:10px 16px;min-height:44px}
+.card{background:var(--card);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.hero{display:flex;align-items:center;justify-content:space-between}
+.temp{font-size:72px;font-weight:700;line-height:1}
+.temp small{font-size:32px}
+.hero img{width:96px;height:96px}
+select{font:inherit;font-size:20px;width:100%;min-height:48px;padding:8px 12px;border-radius:12px;border:2px solid var(--pri);background:var(--card);color:var(--ink);margin:8px 0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.stat{background:var(--bg);border-radius:14px;padding:10px 12px}
+.stat b{display:block;font-size:28px}
+.stat span{color:var(--sub);font-size:15px}
+.warn{background:var(--warnbg);color:var(--warn);font-weight:700;border-radius:14px;padding:10px 14px;margin-top:8px}
+.ok{color:var(--sub);margin-top:8px}
+h2{font-size:21px;margin:0 0 8px}
+.sub{color:var(--sub);font-size:16px}
+.day{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid rgba(128,128,128,.25)}
+.day:first-of-type{border-top:0}
+.day img{width:48px;height:48px}
+.d1{font-weight:700}
+.d2{font-size:15px;color:var(--sub)}
+.tr{font-size:22px;font-weight:700;text-align:right;white-space:nowrap}
+.tr small{display:block;font-size:14px;font-weight:400;color:var(--sub)}
+.err{background:var(--warnbg);color:var(--warn);padding:10px 14px;border-radius:12px;display:none;margin:8px 0}
+footer{text-align:center;color:var(--sub);font-size:14px;padding:16px 8px 28px}
+footer a{color:var(--pri)}
+#install{display:none;width:100%;margin-top:8px}
+p{margin:6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>🌤️ 天氣一眼睇</h1><button id="refresh" aria-label="重新整理">↻ 更新</button></header>
+<div id="err" class="err"></div>
+
+<section class="card" id="now">
+<div class="hero"><div><div class="temp"><span id="t">--</span><small>°C</small></div><div class="sub" id="place">載入中…</div></div><img id="icon" alt="" hidden></div>
+<select id="station" aria-label="揀氣溫站"></select>
+<div class="stats">
+<div class="stat"><span>相對濕度</span><b id="rh">--</b></div>
+<div class="stat"><span>紫外線指數</span><b id="uv">--</b></div>
+</div>
+<div id="warns"></div>
+<div class="sub" id="upd" style="margin-top:10px"></div>
+<button id="install">📲 加到主畫面</button>
+</section>
+
+<section class="card">
+<h2>今日本港天氣預報</h2>
+<div class="sub" id="fper"></div>
+<p id="fdesc">--</p>
+<p class="sub" id="foutlook"></p>
+</section>
+
+<section class="card">
+<h2>未來九天預報</h2>
+<div id="days"></div>
+</section>
+
+<footer>資料來源：<a href="https://www.hko.gov.hk" target="_blank" rel="noopener">香港天文台</a>（<a href="https://data.weather.gov.hk/weatherAPI/doc/HKO_Open_Data_API_Documentation_tc.pdf" target="_blank" rel="noopener">開放數據 API</a>）<br>每 10 分鐘自動更新 · 只供參考，以天文台公佈為準</footer>
+</div>
+<script>
+const API='https://data.weather.gov.hk/weatherAPI/opendata/weather.php?lang=tc&dataType=';
+const ICON=n=>'https://www.hko.gov.hk/images/HKOWxIconOutline/pic'+n+'.png';
+const $=id=>document.getElementById(id);
+const KEY_ST='wx_station',KEY_DATA='wx_cache',REFRESH=10*60*1000;
+let state={cur:null,flw:null,fnd:null,warn:null},lastOk=0,loading=false;
+
+async function get(t){
+  const c=new AbortController(),to=setTimeout(()=>c.abort(),15000);
+  try{const r=await fetch(API+t+'&_='+Math.floor(Date.now()/60000),{signal:c.signal});
+    if(!r.ok)throw new Error(t+' HTTP '+r.status);return await r.json();}
+  finally{clearTimeout(to)}
+}
+const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+async function load(){
+  if(loading)return;loading=true;$('refresh').textContent='… 更新中';
+  const names=['rhrread','flw','fnd','warnsum'];
+  const res=await Promise.allSettled(names.map(get));
+  let fails=0;
+  res.forEach((r,i)=>{
+    const k=['cur','flw','fnd','warn'][i];
+    if(r.status==='fulfilled')state[k]=r.value;else fails++;
+  });
+  if(fails<names.length){lastOk=Date.now();try{localStorage.setItem(KEY_DATA,JSON.stringify({state,lastOk}))}catch(e){}}
+  const e=$('err');
+  if(fails){e.style.display='block';e.textContent=fails===names.length?'連唔到天文台，顯示上次資料。':'部分資料更新失敗，已顯示可用資料。'}
+  else e.style.display='none';
+  render();loading=false;$('refresh').textContent='↻ 更新';
+}
+
+function fmtTime(s){if(!s)return'';const d=new Date(s);if(isNaN(d))return'';
+  return d.toLocaleString('zh-HK',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Hong_Kong'})}
+
+function render(){
+  const c=state.cur;
+  if(c){
+    const temps=(c.temperature&&c.temperature.data)||[];
+    const sel=$('station');
+    const saved=localStorage.getItem(KEY_ST)||'香港天文台';
+    const names=temps.map(x=>x.place);
+    if(sel.options.length!==names.length||names.some((n,i)=>sel.options[i].value!==n)){
+      sel.innerHTML=names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');
+    }
+    const cur=names.includes(saved)?saved:(names.includes('香港天文台')?'香港天文台':names[0]);
+    sel.value=cur;
+    const row=temps.find(x=>x.place===cur);
+    $('t').textContent=row?row.value:'--';
+    $('place').textContent=cur+'．現時氣溫';
+    const hd=(c.humidity&&c.humidity.data)||[];
+    const h=hd.find(x=>x.place===cur)||hd[0];
+    $('rh').textContent=h?h.value+'%':'--';
+    $('rh').nextElementSibling;
+    const uvd=c.uvindex&&c.uvindex.data;
+    $('uv').textContent=uvd&&uvd.length?uvd[0].value+'（'+uvd[0].desc+'）':'夜間／未有';
+    const ic=c.icon&&c.icon[0];
+    if(ic){$('icon').src=ICON(ic);$('icon').hidden=false}
+    $('upd').textContent='氣溫記錄：'+fmtTime(c.temperature&&c.temperature.recordTime)+'　更新：'+fmtTime(lastOk?new Date(lastOk).toISOString():c.updateTime);
+  }
+  renderWarn();
+  const f=state.flw;
+  if(f){
+    $('fper').textContent=(f.forecastPeriod||'')+(f.updateTime?'（'+fmtTime(f.updateTime)+' 更新）':'');
+    $('fdesc').textContent=[f.generalSituation,f.forecastDesc].filter(Boolean).join(' ')||'--';
+    $('foutlook').textContent=f.outlook?'展望：'+f.outlook:'';
+  }
+  const n=state.fnd;
+  if(n&&n.weatherForecast){
+    $('days').innerHTML=n.weatherForecast.map(d=>{
+      const s=String(d.forecastDate);
+      return '<div class="day"><img src="'+ICON(d.ForecastIcon)+'" alt="" loading="lazy">'+
+      '<div><div class="d1">'+(+s.slice(4,6))+'月'+(+s.slice(6,8))+'日 '+esc(d.week)+'</div>'+
+      '<div class="d2">'+esc(d.forecastWeather)+'</div>'+
+      '<div class="d2">💧 降雨概率：'+esc(d.PSR||'--')+'</div></div>'+
+      '<div class="tr">'+d.forecastMintemp.value+'–'+d.forecastMaxtemp.value+'°<small>濕度 '+d.forecastMinrh.value+'–'+d.forecastMaxrh.value+'%</small></div></div>';
+    }).join('');
+  }
+}
+
+function renderWarn(){
+  const box=$('warns');let items=[];
+  const w=state.warn;
+  if(w&&typeof w==='object'){
+    for(const k in w){const x=w[k];if(x&&x.actionCode!=='CANCEL')items.push(x.name||k)}
+  }
+  if(!items.length&&state.cur&&state.cur.warningMessage){
+    const m=state.cur.warningMessage;items=(Array.isArray(m)?m:[m]).filter(Boolean);
+  }
+  box.innerHTML=items.length?items.map(t=>'<div class="warn">⚠️ '+esc(t)+'</div>').join(''):'<div class="ok">✅ 暫時冇生效中嘅天氣警告</div>';
+}
+
+$('station').addEventListener('change',e=>{localStorage.setItem(KEY_ST,e.target.value);render()});
+$('refresh').addEventListener('click',load);
+setInterval(load,REFRESH);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastOk>REFRESH)load()});
+
+try{const s=JSON.parse(localStorage.getItem(KEY_DATA)||'null');if(s){state=s.state;lastOk=s.lastOk;render()}}catch(e){}
+load();
+
+let dp=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('install').style.display='block'});
+$('install').addEventListener('click',async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;$('install').style.display='none'}});
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!navigator.standalone;
+if(ios){$('install').style.display='block';$('install').textContent='📲 Safari：㩒分享 →「加入主畫面」';$('install').onclick=null}
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+</script>
+</body>
+</html>
