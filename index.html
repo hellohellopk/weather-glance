@@ -30,8 +30,11 @@ button:disabled{opacity:.6}
 .hero{display:flex;align-items:center;justify-content:space-between}
 .temp{font-size:68px;font-weight:700;line-height:1;text-shadow:0 3px 14px rgba(0,0,0,.22)}
 .temp small{font-size:30px}
-.hero img,.dt img{background:rgba(255,255,255,.62);border-radius:20px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
-.hero img{width:84px;height:84px}
+.ico{display:grid;place-items:center;flex:none;padding:5px;border-radius:20px;background:linear-gradient(145deg,rgba(96,165,255,.68),rgba(140,96,230,.74));border:1px solid rgba(255,255,255,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 14px rgba(40,30,120,.32)}
+.ico[hidden]{display:none}
+.ico svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 3px rgba(20,20,80,.35))}
+.hero .ico{width:84px;height:84px}
+.dt .ico{width:48px;height:48px;border-radius:15px;padding:3px}
 .row{display:flex;gap:8px;align-items:center;margin:8px 0 4px}
 select{font:inherit;font-size:19px;flex:1;min-width:0;min-height:46px;padding:6px 12px;border-radius:14px;border:1px solid var(--stroke);background:rgba(255,255,255,.18);color:#fff}
 select option{color:#14243a}
@@ -40,6 +43,12 @@ select option{color:#14243a}
 .stat{background:var(--glass2);border:1px solid rgba(255,255,255,.22);border-radius:16px;padding:8px 12px}
 .stat b{display:block;font-size:25px;line-height:1.2}
 .stat span{color:var(--sub);font-size:14px}
+.aq{display:flex;align-items:center;gap:12px;margin-top:8px;padding:8px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.3);background:var(--glass2)}
+.aq[hidden]{display:none}
+.aqn{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:800;box-shadow:0 0 0 3px rgba(255,255,255,.4),0 4px 12px rgba(0,0,0,.28)}
+.aqt{min-width:0}
+.aqt small{display:block;font-size:13px;color:var(--sub);line-height:1.3}
+.aqt b{display:block;font-size:19px;line-height:1.25}
 .banner{border-radius:20px;padding:12px 14px;margin:8px 0;font-weight:800;font-size:22px;line-height:1.2;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,.4);box-shadow:0 6px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.45)}
 .banner .ic{font-size:28px;line-height:1;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.3);display:grid;place-items:center;flex:none}
 .banner small{display:block;font-size:13px;font-weight:500;opacity:.92;margin-top:2px}
@@ -47,12 +56,6 @@ select option{color:#14243a}
 @keyframes pulse{50%{transform:scale(1.015);box-shadow:0 0 0 6px rgba(255,80,80,.3)}}
 @media(prefers-reduced-motion:reduce){.banner.sev{animation:none}}
 .ok{display:inline-block;color:var(--ink);font-size:15px;margin:6px 0 2px;padding:3px 12px;border-radius:999px;background:var(--glass);border:1px solid var(--stroke)}
-.tip{display:flex;gap:10px;align-items:center;padding:7px 0;border-top:1px solid rgba(255,255,255,.18)}
-.tip:first-of-type{border-top:0;padding-top:2px}
-.tip .ic{font-size:24px;width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;flex:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
-.tip b{font-size:19px;display:block;line-height:1.25}
-.tip span{color:var(--sub);font-size:14px;line-height:1.3}
-.tip.lv3 b{color:var(--warn)}
 h2{font-size:19px;margin:0 0 6px;line-height:1.25}
 .sub{color:var(--sub);font-size:15px}
 .priv{color:var(--sub);font-size:12.5px;line-height:1.3}
@@ -64,7 +67,6 @@ h2{font-size:19px;margin:0 0 6px;line-height:1.25}
 .day{padding:8px 0;border-top:1px solid rgba(255,255,255,.18)}
 .day:first-of-type{border-top:0}
 .dt{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center}
-.dt img{width:48px;height:48px;border-radius:15px;padding:3px}
 .d1{font-weight:700;line-height:1.25}
 .d2{font-size:14px;color:var(--sub);line-height:1.25}
 .tr{font-size:21px;font-weight:700;text-align:right;white-space:nowrap;line-height:1.2}
@@ -81,24 +83,29 @@ p{margin:4px 0;line-height:1.4}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<radialGradient id="gSun" cx=".35" cy=".35" r=".8"><stop offset="0" stop-color="#fff6a8"/><stop offset=".55" stop-color="#ffd23f"/><stop offset="1" stop-color="#ff9f1a"/></radialGradient>
+<linearGradient id="gMoon" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset="1" stop-color="#ffd98a"/></linearGradient>
+<linearGradient id="gCloud" gradientUnits="userSpaceOnUse" x1="0" y1="7" x2="0" y2="38"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9dcff"/></linearGradient>
+<linearGradient id="gCloudD" gradientUnits="userSpaceOnUse" x1="0" y1="7" x2="0" y2="38"><stop offset="0" stop-color="#c3cbe6"/><stop offset="1" stop-color="#7684ad"/></linearGradient>
+<linearGradient id="gBolt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff176"/><stop offset="1" stop-color="#ffa000"/></linearGradient>
+<linearGradient id="gDrop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fe3ff"/><stop offset="1" stop-color="#2f8fff"/></linearGradient>
+<mask id="mm" maskUnits="userSpaceOnUse" x="-100" y="-100" width="300" height="300"><rect x="-100" y="-100" width="300" height="300" fill="#fff"/><circle cx="9" cy="-6" r="14" fill="#000"/></mask>
+</defs></svg>
 <div class="wrap">
 <header><h1>🌤️ 天氣一眼睇</h1><button id="refresh" aria-label="重新整理">↻ 更新</button></header>
 <div id="err" class="err"></div>
 <div id="warns" aria-live="polite"></div>
 
-<section class="card">
-<h2>🚪 出門口小貼士</h2>
-<div id="tips"><div class="sub">載入中…</div></div>
-</section>
-
 <section class="card" id="now">
-<div class="hero"><div><div class="temp"><span id="t">--</span><small>°C</small></div><div class="sub" id="place">載入中…</div><div class="sub" id="dist"></div></div><img id="icon" alt="" hidden></div>
+<div class="hero"><div><div class="temp"><span id="t">--</span><small>°C</small></div><div class="sub" id="place">載入中…</div><div class="sub" id="dist"></div></div><div class="ico" id="icon" hidden></div></div>
 <div class="row"><select id="station" aria-label="揀氣溫站"></select><button id="near">📍 我附近</button></div>
 <div class="priv">🔒 位置只喺你部手機度計算，唔會上傳或儲存。</div>
 <div class="stats">
 <div class="stat"><span>💧 相對濕度</span><b id="rh">--</b></div>
 <div class="stat"><span>☀️ 紫外線指數</span><b id="uv">--</b></div>
 </div>
+<div class="aq" id="aq" hidden></div>
 <div class="sub" id="upd" style="margin-top:8px;font-size:13px"></div>
 <button id="install">📲 加到主畫面</button>
 </section>
@@ -117,44 +124,27 @@ p{margin:4px 0;line-height:1.4}
 <div id="days"></div>
 </section>
 
-<footer>資料來源：<a href="https://www.hko.gov.hk" target="_blank" rel="noopener">香港天文台</a>（<a href="https://data.weather.gov.hk/weatherAPI/doc/HKO_Open_Data_API_Documentation_tc.pdf" target="_blank" rel="noopener">開放數據 API</a>）<br>每 10 分鐘自動更新 · 只供參考，以天文台公佈為準</footer>
+<footer>資料來源：<a href="https://www.hko.gov.hk" target="_blank" rel="noopener">香港天文台</a>（<a href="https://data.weather.gov.hk/weatherAPI/doc/HKO_Open_Data_API_Documentation_tc.pdf" target="_blank" rel="noopener">開放數據 API</a>）、<a href="https://www.aqhi.gov.hk" target="_blank" rel="noopener">環境保護署</a>（空氣質素健康指數）<br>每 10 分鐘自動更新 · 只供參考，以官方公佈為準</footer>
 </div>
 <script>
 const COORD={"King's Park":[22.31194,114.17278],"Hong Kong Observatory":[22.30194,114.17417],"Wong Chuk Hang":[22.24778,114.17361],"Ta Kwu Ling":[22.52861,114.15667],"Lau Fau Shan":[22.46889,113.98361],"Tai Po":[22.44833,114.17722],"Sha Tin":[22.4025,114.21],"Tuen Mun":[22.38583,113.96417],"Tseung Kwan O":[22.31583,114.25556],"Sai Kung":[22.37556,114.27444],"Cheung Chau":[22.20111,114.02667],"Chek Lap Kok":[22.30944,113.92194],"Tsing Yi":[22.34417,114.11],"Shek Kong":[22.43611,114.08472],"Tsuen Wan Ho Koon":[22.38361,114.10778],"Tsuen Wan Shing Mun Valley":[22.37556,114.12667],"Hong Kong Park":[22.27833,114.16222],"Shau Kei Wan":[22.28167,114.23611],"Kowloon City":[22.335,114.18472],"Happy Valley":[22.27056,114.18361],"Wong Tai Sin":[22.33944,114.20528],"Stanley":[22.21417,114.21861],"Kwun Tong":[22.31861,114.22472],"Sham Shui Po":[22.33583,114.13694],"Kai Tak Runway Park":[22.305,114.21694],"Yuen Long Park":[22.44083,114.01833],"Tai Mei Tuk":[22.47528,114.2375],"Sheung Shui":[22.50194,114.11111],"Tap Mun":[22.47139,114.36056],"Tate's Cairn":[22.35778,114.21778],"Tai Mo Shan":[22.41056,114.12444],"Ngong Ping":[22.25861,113.91278],"The Peak":[22.26417,114.155],"Wetland Park":[22.46667,114.00889],"Peng Chau":[22.29111,114.04333],"Waglan Island":[22.18222,114.30333],"Ping Chau":[22.54667,114.42833],"Kat O":[22.53639,114.30194],"Lamma Island":[22.22611,114.10861],"Sha Lo Wan":[22.29111,113.90694],"Clear Water Bay":[22.26333,114.29972],"Kau Sai Chau":[22.37028,114.3125],"Tai Lung":[22.48472,114.1175],"Pak Tam Chung":[22.40278,114.32306],"Hong Kong International Airport":[22.30944,113.92194],"Kadoorie Farm and Botanic Garden":[22.43278,114.12083],"Tuen Mun Children and Juvenile Home":[22.38583,113.96417],"Nei Lak Shan":[22.26333,113.91111]};
-const DIST={"Central & Western District":[22.2825,114.145],"Eastern District":[22.28,114.22],"Kwai Tsing":[22.356,114.125],"Islands District":[22.26,113.95],"North District":[22.5,114.15],"Sai Kung":[22.38,114.27],"Sha Tin":[22.38,114.19],"Southern District":[22.245,114.17],"Tai Po":[22.45,114.17],"Tsuen Wan":[22.37,114.12],"Tuen Mun":[22.39,113.975],"Wan Chai":[22.275,114.175],"Yuen Long":[22.445,114.035],"Yau Tsim Mong":[22.31,114.17],"Sham Shui Po":[22.33,114.16],"Kowloon City":[22.328,114.19],"Wong Tai Sin":[22.342,114.2],"Kwun Tong":[22.312,114.225]};
+const AQ_ST=[{"n":"Central/Western","z":"中西區","p":[22.2858,114.1431]},{"n":"Southern","z":"南區","p":[22.2478,114.1596]},{"n":"Eastern","z":"東區","p":[22.2646,114.237]},{"n":"Kwun Tong","z":"觀塘","p":[22.3098,114.2312]},{"n":"Sham Shui Po","z":"深水埗","p":[22.3305,114.1594]},{"n":"Kwai Chung","z":"葵涌","p":[22.3571,114.1296]},{"n":"Tsuen Wan","z":"荃灣","p":[22.3713,114.1143]},{"n":"Tseung Kwan O","z":"將軍澳","p":[22.3178,114.2594]},{"n":"Yuen Long","z":"元朗","p":[22.4452,114.0227]},{"n":"Tuen Mun","z":"屯門","p":[22.3913,113.977]},{"n":"Tung Chung","z":"東涌","p":[22.2889,113.9437]},{"n":"Tai Po","z":"大埔","p":[22.4509,114.1646]},{"n":"Sha Tin","z":"沙田","p":[22.3763,114.1845]},{"n":"North","z":"北區","p":[22.4969,114.1286]},{"n":"Tap Mun","z":"塔門","p":[22.4714,114.3606]}];
 function hav(a,b,c,d){const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b);
   const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 function nearestStation(lat,lon,enNames){let best=-1,bd=1e9;
   enNames.forEach((n,i)=>{const p=COORD[n];if(!p)return;const d=hav(lat,lon,p[0],p[1]);if(d<bd){bd=d;best=i}});
   return best<0?null:{idx:best,km:bd}}
-function nearestDistrict(lat,lon,enNames){let best=-1,bd=1e9;
-  enNames.forEach((n,i)=>{const p=DIST[n];if(!p)return;const d=hav(lat,lon,p[0],p[1]);if(d<bd){bd=d;best=i}});
-  return best<0?null:{idx:best,km:bd}}
-const PSR_LV={'低':0,'中低':1,'中':2,'中高':3,'高':3};
-function tipUmbrella(psr,rainMm,place,rainWarn){
-  let lv=PSR_LV[psr]??0,why=[];
-  if(rainWarn){lv=3;why.push('有暴雨警告生效')}
-  if(rainMm>=1){lv=3}else if(rainMm>0){lv=Math.max(lv,2)}
-  const head=['😎 唔使帶遮','🌂 遮可帶可唔帶','🌂 帶把遮備用較穩陣','☔ 要帶遮！'][lv];
-  const rainTxt=(place?place+'過去一小時雨量：':'過去一小時雨量：')+(rainMm==null?'未有數據':rainMm+' 毫米');
-  return{lv,icon:lv>=3?'☔':lv==2?'🌂':'😎',head:head.replace(/^\S+\s/,''),
-    line:'今日降雨概率：'+(psr||'未有')+'．'+rainTxt+(why.length?'．'+why.join('、'):'')}}
-function tipClothes(mn){
-  if(mn==null||isNaN(mn))return null;
-  let n,t,ic='👕';
-  if(mn>=28){n='1 件';t='短袖輕薄衫就夠'}
-  else if(mn>=24){n='1 件';t='短袖，冷氣房可帶件薄外套'}
-  else if(mn>=20){n='2 件';t='短袖＋薄外套或襯衫'}
-  else if(mn>=16){n='2–3 件';t='長袖衫＋外套';ic='🧥'}
-  else if(mn>=12){n='3 件';t='衛衣或毛衣＋外套';ic='🧥'}
-  else if(mn>=8){n='3–4 件';t='內層＋毛衣＋厚外套';ic='🧥'}
-  else{n='4–5 件';t='保暖內衣＋毛衣＋大褸，加頸巾手套';ic='🧣'}
-  return{icon:ic,head:'著 '+n,line:'今日最低氣溫 '+mn+'°C：'+t}}
-function tipUV(v,desc){
-  if(v==null||isNaN(v))return null;
-  if(v>=6)return{lv:3,icon:'🧴',head:'要防曬！',line:'紫外線指數 '+v+(desc?'（'+desc+'）':'')+'：搽防曬、戴帽同太陽眼鏡'};
-  if(v>=3)return{lv:1,icon:'🧴',head:'建議防曬',line:'紫外線指數 '+v+(desc?'（'+desc+'）':'')+'：長時間喺戶外記得搽防曬'};
-  return null}
+function nearestAq(lat,lon,have){let best=null,bd=1e9;
+  AQ_ST.forEach(s=>{if(have&&!have.includes(s.n))return;const d=hav(lat,lon,s.p[0],s.p[1]);if(d<bd){bd=d;best=s}});
+  return best?{st:best,km:bd}:null}
+function aqVal(v){if(typeof v==='string'){return v.indexOf('+')>=0?11:parseInt(v,10)}return Number(v)}
+function aqLevel(v){
+  if(!(v>=1))return null;
+  if(v<=3)return{zh:'低',bg:'#2e9d4f',fg:'#fff'};
+  if(v<=6)return{zh:'中',bg:'#f2c200',fg:'#3a2f00'};
+  if(v===7)return{zh:'高',bg:'#f57c00',fg:'#fff'};
+  if(v<=10)return{zh:'甚高',bg:'#d32f2f',fg:'#fff'};
+  return{zh:'嚴重',bg:'#222222',fg:'#fff'}}
 function warnStyle(key,code){
   const S=(bg,fg,ic,rank)=>({bg,fg,ic,rank});
   if(key==='WRAIN'){
@@ -182,30 +172,68 @@ function rangeBars(days){
   const lo=Math.min(...mins),hi=Math.max(...maxs),span=Math.max(1,hi-lo);
   return{lo,hi,coldIdx:mins.indexOf(lo),hotIdx:maxs.indexOf(hi),
     bars:days.map((d,i)=>({l:(mins[i]-lo)/span*100,w:(maxs[i]-mins[i])/span*100,c1:tempHue(mins[i],lo,hi),c2:tempHue(maxs[i],lo,hi)}))}}
+const ICs={
+  cloud:(x,y,s,d)=>'<g transform="translate('+x+' '+y+') scale('+s+')" fill="url(#'+(d?'gCloudD':'gCloud')+')"><circle cx="18" cy="26" r="10"/><circle cx="30" cy="20" r="13"/><circle cx="43" cy="27" r="9"/><rect x="8" y="26" width="44" height="11" rx="5.5"/></g>',
+  sun:(cx,cy,r)=>{let g='<g stroke="#ffc933" stroke-width="3" stroke-linecap="round">';
+    for(let i=0;i<8;i++){const a=i*Math.PI/4,c=Math.cos(a),s=Math.sin(a);
+      g+='<line x1="'+(cx+c*(r+4)).toFixed(1)+'" y1="'+(cy+s*(r+4)).toFixed(1)+'" x2="'+(cx+c*(r+8)).toFixed(1)+'" y2="'+(cy+s*(r+8)).toFixed(1)+'"/>'}
+    return g+'</g><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="url(#gSun)"/>'},
+  moon:(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><circle r="16" fill="url(#gMoon)" mask="url(#mm)"/></g>',
+  stars:(a)=>a.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(p[2]||1.6)+'" fill="#fff" opacity=".9"/>').join(''),
+  drops:(a,w)=>'<g stroke="#6fd0ff" stroke-width="'+(w||3.2)+'" stroke-linecap="round" fill="none">'+a.map(p=>'<path d="M'+p[0]+' '+p[1]+' l-2.6 '+(p[2]||7)+'"/>').join('')+'</g>',
+  lines:(a,c,w)=>'<g stroke="'+(c||'#fff')+'" stroke-width="'+(w||3.4)+'" stroke-linecap="round" fill="none">'+a.map(p=>'<path d="M'+p[0]+' '+p[1]+'h'+p[2]+'"/>').join('')+'</g>',
+  thermo:(col,top)=>'<rect x="26" y="8" width="9" height="40" rx="4.5" fill="#fff" opacity=".95"/><circle cx="30.5" cy="49" r="10" fill="'+col+'"/><rect x="28.9" y="'+top+'" width="3.2" height="'+(49-top)+'" rx="1.6" fill="'+col+'"/>'
+};
+function wxIcon(n){
+  n=+n;const I=ICs;let b;
+  if(n===50)b=I.sun(32,32,13);
+  else if(n===51||n===52)b=I.sun(24,24,10)+I.cloud(10,22,.9);
+  else if(n===53||n===54)b=I.sun(22,20,9)+I.cloud(8,14,.9)+I.drops([[26,50],[36,50],[46,50]],3);
+  else if(n===60)b=I.cloud(16,6,.85,true)+I.cloud(-4,14,1.05);
+  else if(n===61)b=I.cloud(16,6,.85,true)+I.cloud(-4,14,1.05,true);
+  else if(n===62)b=I.cloud(2,-6,1,true)+I.drops([[25,40],[39,40]]);
+  else if(n===63)b=I.cloud(2,-6,1,true)+I.drops([[21,40],[32,40],[43,40],[27,50],[38,50]]);
+  else if(n===64)b=I.cloud(2,-8,1,true)+I.drops([[19,36,9],[28,36,9],[37,36,9],[46,36,9],[23,48,9],[32,48,9],[41,48,9]],3.6);
+  else if(n===65)b=I.cloud(2,-8,1,true)+'<polygon points="35,27 24,46 31,46 27,60 43,39 35,39 39,27" fill="url(#gBolt)"/>'+I.drops([[17,40],[50,40]]);
+  else if(n>=70&&n<=75)b=I.moon(28,34,1.35)+I.stars([[48,14],[54,28,1.3],[40,8,1.2]]);
+  else if(n===76)b=I.moon(24,22,.95)+I.cloud(-6,12,1.2);
+  else if(n===77)b=I.moon(24,24,1)+I.cloud(12,24,.8)+I.stars([[50,14,1.4]]);
+  else if(n===80)b='<g stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"><path d="M10 24h30a7 7 0 1 0-7-7"/><path d="M8 36h40a8 8 0 1 1-8 8"/><path d="M14 48h22"/></g>';
+  else if(n===81)b='<path d="M32 10C32 10 18 28 18 38a14 14 0 0 0 28 0C46 28 32 10 32 10z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/><path d="M13 13L51 53" stroke="#ffb74d" stroke-width="4.5" stroke-linecap="round"/>';
+  else if(n===82)b='<path d="M32 8C32 8 16 28 16 40a16 16 0 0 0 32 0C48 28 32 8 32 8z" fill="url(#gDrop)"/><path d="M24 40a8 8 0 0 0 6 8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" opacity=".8"/>'+I.drops([[52,14,5],[12,18,5]],2.6);
+  else if(n===83)b=I.cloud(2,-4,1,true)+I.lines([[10,41,44],[16,48,38],[10,55,30]]);
+  else if(n===84)b=I.lines([[10,20,40],[16,30,38],[8,40,42],[18,50,28]],'#fff',3.6);
+  else if(n===85)b=I.sun(32,24,10)+I.lines([[8,44,48],[14,51,40],[8,58,34]],'#ffcc80',3.2);
+  else if(n===90)b=I.thermo('#ff5252',16)+I.sun(50,16,6);
+  else if(n===91)b=I.thermo('#ffa726',28)+I.sun(50,16,6);
+  else if(n===92)b=I.thermo('#4fc3f7',34);
+  else if(n===93)b=I.thermo('#4aa3ff',38)+'<g stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M50 8v16M42 16h16M44 10l12 12M56 10L44 22"/></g>';
+  else b=I.cloud(-4,12,1.2);
+  return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">'+b+'</svg>'}
 const API='https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=';
-const ICON=n=>'https://www.hko.gov.hk/images/HKOWxIconOutline/pic'+n+'.png';
+const AQ_URL='https://dashboard.data.gov.hk/api/aqhi-individual?format=json';
 const $=id=>document.getElementById(id);
-const KEY_ST='wx_station',KEY_DATA='wx_cache2',REFRESH=10*60*1000;
-let state={cur:null,flw:null,fnd:null,warn:null,enT:[],enR:[]},lastOk=0,loading=false;
+const KEY_ST='wx_station',KEY_DATA='wx_cache3',REFRESH=10*60*1000;
+let state={cur:null,flw:null,fnd:null,warn:null,enT:[],aq:null},lastOk=0,loading=false;
 let userPos=null,nearKm=null;
 
-async function get(t,lang){
+async function getJ(url){
   const c=new AbortController(),to=setTimeout(()=>c.abort(),15000);
-  try{const r=await fetch(API+t+'&lang='+(lang||'tc')+'&_='+Math.floor(Date.now()/60000),{signal:c.signal});
-    if(!r.ok)throw new Error(t+' HTTP '+r.status);return await r.json();}
+  try{const r=await fetch(url,{signal:c.signal});
+    if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}
   finally{clearTimeout(to)}
 }
+const get=(t,lang)=>getJ(API+t+'&lang='+(lang||'tc')+'&_='+Math.floor(Date.now()/60000));
 const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
 async function load(){
   if(loading)return;loading=true;$('refresh').textContent='… 更新中';
-  const jobs=[get('rhrread'),get('flw'),get('fnd'),get('warnsum'),get('rhrread','en')];
-  const res=await Promise.allSettled(jobs);
+  const res=await Promise.allSettled([get('rhrread'),get('flw'),get('fnd'),get('warnsum'),get('rhrread','en'),getJ(AQ_URL)]);
   let fails=0;
   ['cur','flw','fnd','warn'].forEach((k,i)=>{if(res[i].status==='fulfilled')state[k]=res[i].value;else fails++});
   if(res[4].status==='fulfilled'){const e=res[4].value;
-    state.enT=((e.temperature&&e.temperature.data)||[]).map(x=>x.place);
-    state.enR=((e.rainfall&&e.rainfall.data)||[]).map(x=>x.place)}
+    state.enT=((e.temperature&&e.temperature.data)||[]).map(x=>x.place)}
+  if(res[5].status==='fulfilled'&&Array.isArray(res[5].value))state.aq=res[5].value;
   if(fails<4){lastOk=Date.now();try{localStorage.setItem(KEY_DATA,JSON.stringify({state,lastOk}))}catch(e){}}
   const e=$('err');
   if(fails){e.style.display='block';e.textContent=fails===4?'連唔到天文台，顯示上次資料。':'部分資料更新失敗，已顯示可用資料。'}
@@ -244,10 +272,10 @@ function render(){
     const uvd=c.uvindex&&c.uvindex.data;
     $('uv').textContent=uvd&&uvd.length?uvd[0].value+'（'+uvd[0].desc+'）':'夜間／未有';
     const ic=c.icon&&c.icon[0];
-    if(ic){$('icon').src=ICON(ic);$('icon').hidden=false}
+    if(ic){$('icon').innerHTML=wxIcon(ic);$('icon').hidden=false}
     $('upd').textContent='氣溫記錄：'+fmtTime(c.temperature&&c.temperature.recordTime)+'　更新：'+fmtTime(lastOk?new Date(lastOk).toISOString():c.updateTime);
   }
-  renderWarn();renderTips();
+  renderWarn();renderAq();
   const f=state.flw;
   if(f){
     $('fper').textContent=(f.forecastPeriod||'')+(f.updateTime?'（'+fmtTime(f.updateTime)+' 更新）':'');
@@ -255,6 +283,27 @@ function render(){
     $('foutlook').textContent=f.outlook?'展望：'+f.outlook:'';
   }
   renderDays();
+}
+
+function renderAq(){
+  const box=$('aq'),data=state.aq;
+  if(!Array.isArray(data)||!data.length){box.hidden=true;return}
+  let lat,lon;
+  if(userPos){lat=userPos[0];lon=userPos[1]}
+  else{const S=selectedStation(),p=COORD[state.enT[S.idx]]||COORD['Hong Kong Observatory'];lat=p[0];lon=p[1]}
+  const have=data.map(x=>x.station);
+  const n=nearestAq(lat,lon,have);
+  if(!n){box.hidden=true;return}
+  const row=data.find(x=>x.station===n.st.n);
+  const v=row?aqVal(row.aqhi):NaN,lv=aqLevel(v);
+  if(!lv){box.hidden=true;return}
+  const m=/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/.exec(row.publish_date||'');
+  const tm=m?(+m[2])+'/'+(+m[3])+' '+m[4]+':'+m[5]:'';
+  const dk=n.km<1?Math.round(n.km*1000)+' 米':n.km.toFixed(1)+' 公里';
+  box.hidden=false;
+  box.style.borderColor=lv.bg;
+  box.style.background='linear-gradient(90deg,'+lv.bg+'66,rgba(255,255,255,.1))';
+  box.innerHTML='<div class="aqn" style="background:'+lv.bg+';color:'+lv.fg+'">'+(v>10?'10+':v)+'</div><div class="aqt"><small>🌫️ 空氣質素健康指數 AQHI</small><b>健康風險：'+lv.zh+'</b><small>'+esc(n.st.z)+'監測站（距離'+(userPos?'你':'所選位置')+'約 '+dk+'）'+(tm?'・'+tm+' 更新':'')+'</small></div>';
 }
 
 function activeWarns(){
@@ -274,34 +323,6 @@ function renderWarn(){
   box.innerHTML=items.length?items.map(x=>'<div class="banner'+(x.st.rank>=90?' sev':'')+'" role="alert" style="background:'+x.st.bg+';color:'+x.st.fg+'"><span class="ic">'+x.st.ic+'</span><div>'+esc(x.name)+(x.time?'<small>發出：'+esc(fmtTime(x.time))+'</small>':'')+'</div></div>').join(''):'<div class="ok">✅ 暫時冇生效中嘅天氣警告</div>';
 }
 
-function rainNear(){
-  const c=state.cur,rd=(c&&c.rainfall&&c.rainfall.data)||[];
-  if(!rd.length||!state.enR.length)return{mm:null,place:''};
-  let lat,lon;
-  if(userPos){lat=userPos[0];lon=userPos[1]}
-  else{const S=selectedStation(),p=COORD[state.enT[S.idx]];if(!p)return{mm:null,place:''};lat=p[0];lon=p[1]}
-  const n=nearestDistrict(lat,lon,state.enR);
-  if(!n||!rd[n.idx])return{mm:null,place:''};
-  const v=rd[n.idx].max;
-  return{mm:v==null?0:Number(v),place:rd[n.idx].place}
-}
-function renderTips(){
-  const box=$('tips'),f=state.fnd,c=state.cur;
-  if(!f&&!c){return}
-  const d0=f&&f.weatherForecast&&f.weatherForecast[0];
-  const rw=activeWarns().some(x=>x.key==='WRAIN');
-  const r=rainNear();
-  const items=[];
-  const u=tipUmbrella(d0&&d0.PSR,r.mm,r.place,rw);
-  items.push({lv:u.lv,icon:u.icon,head:u.head,line:u.line});
-  const cl=tipClothes(d0?Number(d0.forecastMintemp.value):null);
-  if(cl)items.push(cl);
-  const uvd=c&&c.uvindex&&c.uvindex.data;
-  const uv=tipUV(uvd&&uvd.length?Number(uvd[0].value):null,uvd&&uvd.length?uvd[0].desc:'');
-  if(uv)items.push(uv);
-  box.innerHTML=items.map(x=>'<div class="tip lv'+(x.lv||0)+'"><span class="ic">'+x.icon+'</span><div><b>'+esc(x.head)+'</b><span>'+esc(x.line)+'</span></div></div>').join('');
-}
-
 function renderDays(){
   const n=state.fnd;
   if(!(n&&n.weatherForecast&&n.weatherForecast.length))return;
@@ -311,7 +332,7 @@ function renderDays(){
   $('lgl').textContent=R.lo+'°';$('lgh').textContent=R.hi+'°';
   $('days').innerHTML=W.map((d,i)=>{
     const b=R.bars[i];
-    return '<div class="day"><div class="dt"><img src="'+ICON(d.ForecastIcon)+'" alt="" loading="lazy">'+
+    return '<div class="day"><div class="dt"><div class="ico">'+wxIcon(d.ForecastIcon)+'</div>'+
     '<div><div class="d1">'+lbl(d)+' '+esc(d.week)+(i===R.coldIdx?'<span class="badge c">最凍</span>':'')+(i===R.hotIdx?'<span class="badge h">最熱</span>':'')+'</div>'+
     '<div class="d2">'+esc(d.forecastWeather)+'</div>'+
     '<div class="d2">💧 降雨概率：'+esc(d.PSR||'--')+'</div></div>'+
